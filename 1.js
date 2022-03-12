@@ -27,7 +27,7 @@ class Person {
   }
 }
 
-const N = 6
+const N = 100
 const people = []
 for (let i = 0; i < N; i++) {
   people.push(new Person(i))
@@ -44,18 +44,29 @@ const countAbilityToWork = (subset) => {
     }
   }
   return sum
-  // return subset.reduce((sum, person, index, people) => {
-  //   const people_without_current = people.filter(p => p.index !== person.index)
-  //   return sum + people_without_current.reduce((acc, p) => acc + p.weights[index], 0)
-  // }, 0)
 }
 
 const half = Math.ceil(people.length / 2)
 const A = people.slice(0, half)
 const B = people.slice(-half)
 // console.log(people)
-console.log(A)
+
 console.log(countAbilityToWork(A))
-// console.log(B)
+console.log(countAbilityToWork([...A, B[0]]))
+
+let k = 0;
+while (k < B.length - 2) {
+  const new_a = countAbilityToWork([...A, B[k]]);
+  const a = countAbilityToWork(A);
+  console.log(`a: ${a}   new_a: ${new_a}`)
+  if (new_a > a) {
+    A.push(B[k])
+    B.splice(k, 1);
+  } else {
+    k++
+  }
+}
+console.log(countAbilityToWork(A))
+console.log(countAbilityToWork(B))
 
 
