@@ -1,8 +1,8 @@
 {
-  "name": "ALGORYTMY",
+  "name": "algorytmy",
   "version": "1.0.0",
   "description": "",
-  "main": "a.js",
+  "main": "index.js",
   "scripts": {
     "dev": "nodemon ./src/index.js"
   },
