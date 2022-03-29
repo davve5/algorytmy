@@ -112,4 +112,3 @@ console.log(`z powtorzeniami: ${K.length}`)
 // }
 
 // console.log(a(N))
-
