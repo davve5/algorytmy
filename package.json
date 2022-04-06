@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon ./src/liczby.js"
+    "dev": "nodemon ./src/done.js"
   },
   "keywords": [],
   "author": "",

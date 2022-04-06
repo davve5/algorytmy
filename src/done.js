@@ -1,106 +1,92 @@
-class Person {
-  constructor(index) {
-    this.index = index;
-    this.weights = {}
-  }
+const N = 500
 
-  generateWeights(people) {
-    const WEIGHTS = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
-
-    people.forEach(p => {
-      const weight = WEIGHTS[Math.floor(Math.random() * WEIGHTS.length)];
-      if (p.index === this.index) {
-        return;
-      } else if (p.weights[this.index]) {
-        this.weights[p.index] = p.weights[this.index]
-      } else if (this.weights[p.index]) {
-        p.weights[this.index] = this.weights[p.index]
-      } else {
-        this.weights[p.index] = weight
-        p.weights[this.index] = weight
-      }
-    })
-  }
-
-  addWeights(weights) {
-    this.weights = weights
-  }
-}
-
-const N = 10
-const people = []
+const STUDENTS_COOWORK = {}
+const STUDENTS = []
 for (let i = 0; i < N; i++) {
-  people.push(new Person(i))
+  STUDENTS.push(i)
+  for (let j = i + 1; j < N; j++) {
+    STUDENTS_COOWORK[`${i}-${j}`] = Math.floor(Math.random() * 11) - 5
+  }
 }
 
-people.forEach(person => person.generateWeights(people.filter(p => p.index !== person.index)))
-
-const countAbilityToWork = (subset) => {
-  const dict = {}
-  let sum = 0
-  const keys = subset.map(p => p.index)
-  for (let i = 0; i < keys.length; i++) {
-    const current = subset[i]
-    for (key of Object.keys(current.weights).map(Number).filter(k => keys.includes(k) && k !== current.index)) {
-      if (!dict[`${key}${current.index}`] && !dict[`${current.index}${key}`]) {
-        sum += current.weights[`${key}`]
-        // console.log(`${current.index}->${key} \t value: ${current.weights[`${key}`]} \t sum: ${sum}`)
-        dict[`${key}${current.index}`] = true;
-        dict[`${current.index}${key}`] = true;
-      }
+const calculateGroupCoowork = group => {
+  let total_coowork = 0
+  for (let i = 0; i < group.length - 1; i++) {
+    for (let j = i + 1; j < group.length; j++) {
+      const a = group[i]
+      const b = group[j]
+      total_coowork += STUDENTS_COOWORK[`${a}-${b}`] === undefined ? STUDENTS_COOWORK[`${b}-${a}`] : STUDENTS_COOWORK[`${a}-${b}`]
     }
   }
-  // console.log('\n')
-  return sum
+  return total_coowork
 }
 
-function* subsets(array, offset = 0) {
-  while (offset < array.length) {
-    let first = array[offset++]
-    for (let subset of subsets(array, offset)) {
-      subset.push(first)
-      yield subset
-    }
+const shuffle = arr => {
+  const copy = arr.slice()
+  for (let i = copy.length - 1; i > 0; i--) {
+    const rand = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[rand]] = [copy[rand], copy[i]];
   }
-  yield []
+  return copy
+};
+
+const shuffled = shuffle(STUDENTS)
+const A = shuffled.slice(0, Math.floor(N / 2))
+const B = shuffled.slice(Math.floor(N / 2), shuffled.length)
+
+const aCoowork = calculateGroupCoowork(A)
+const bCoowork = calculateGroupCoowork(B)
+
+const the_best_groups_division = {
+  coowork: aCoowork + bCoowork,
+  groups_coowork: [aCoowork, bCoowork],
+  A: A,
+  B: B,
 }
 
+const getStudent = (arr, index) => arr.splice(index, 1)
 
-const X = []
-let k = 0
-for (let a of subsets(people)) {
-  if (a.length < 2 || a.length > N - 2) {
+for (let i = 0; i < N; i++) {
+  if (A.length < 3 || B.length < 3) {
     continue;
   }
-  k++
 
-  const b = [...people].filter(el => !a.includes(el))
-  X.push([a, b])
-}
+  let index = A.findIndex(student => student === i)
 
-const best = {
-  sets: [],
-  coowork: [],
-  total: -Infinity
-}
+  if (index > -1) {
+    const student = getStudent(A, index)
+    const newACoowork = calculateGroupCoowork(A)
+    const newBCoowork = calculateGroupCoowork([...B, student])
 
-const totals = []
+    if (newACoowork + newBCoowork > the_best_groups_division.coowork) {
+      the_best_groups_division.coowork = newACoowork + newBCoowork
+      the_best_groups_division.groups_coowork = [newACoowork, newBCoowork]
+      the_best_groups_division.A = A
+      the_best_groups_division.B = B
+      B.push(student)
+    } else {
+      A.push(student)
+    }
 
-for (let i = 0; i < X.length; i++) {
-  const [a, b] = X[i]
-  const _a = countAbilityToWork(a)
-  const _b = countAbilityToWork(b)
-  const total = _a + _b
-  totals.push(total)
-  // break;
+  } else {
+    index = B.findIndex(student => student === i)
+    const student = getStudent(B, index)
+    const newACoowork = calculateGroupCoowork([...A, student])
+    const newBCoowork = calculateGroupCoowork(B)
 
-  if (total > best.total) {
-    best.sets = [a, b]
-    best.coowork = [_a, _b]
-    best.total = total
+    if (newACoowork + newBCoowork > the_best_groups_division.coowork) {
+      the_best_groups_division.coowork = newACoowork + newBCoowork
+      the_best_groups_division.groups_coowork = [newACoowork, newBCoowork]
+      the_best_groups_division.A = A
+      the_best_groups_division.B = B
+      A.push(student)
+    } else {
+      B.push(student)
+    }
   }
 }
 
-console.log(best.sets[0])
-console.log(best.sets[1])
-console.log(best)
+console.log(`length => A: ${A.length}, B: ${B.length}, N: ${N} V: ${A.length + B.length}`)
+Object.keys(the_best_groups_division).forEach((key) => {
+  console.log(`${key}: ${the_best_groups_division[key]}`)
+})
