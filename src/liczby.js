@@ -10,7 +10,9 @@
  * 5 = 1 + 1 + 1 + 1
  */
 
-let N = 20
+const t0 = performance.now();
+
+let N = 100
 
 let K = []
 function findCombinationsUtil(arr, index, num, reducedNum, stepSize = 2) {
@@ -43,10 +45,10 @@ const findCombinations = (n, stepSize) => {
 
 K = []
 findCombinations(N)
-console.log(K)
-console.log(`z powtorzeniami: ${K.length}`)
+// console.log(K)
+console.log(`z powtorzeniami ${N}: ${K.length}`)
 
-console.log('\n\n')
+// console.log('\n\n')
 
 function* subsets(values, sum, parts = []) {
   var i, s;
@@ -67,5 +69,7 @@ for (let i = 1; i <= N; i++) {
 }
 
 const solution = [...subsets(A, N)];
-console.log(solution)
+// console.log(solution)
+const t1 = performance.now();
 console.log(`Bez powtorzen ${N}: ${solution.length}`)
+console.log(`${((t1 - t0) / 1000).toFixed(2)}s`);
