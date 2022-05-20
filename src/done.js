@@ -49,7 +49,7 @@ const getStudent = (arr, index) => arr.splice(index, 1)
 for (let i = 0; i < N; i++) {
   if (A.length < 3 || B.length < 3) {
     continue;
-  }
+  } 
 
   let index = A.findIndex(student => student === i)
 
@@ -86,7 +86,6 @@ for (let i = 0; i < N; i++) {
   }
 }
 
-console.log(`length => A: ${A.length}, B: ${B.length}, N: ${N} V: ${A.length + B.length}`)
 Object.keys(the_best_groups_division).forEach((key) => {
   console.log(`${key}: ${the_best_groups_division[key]}`)
 })
